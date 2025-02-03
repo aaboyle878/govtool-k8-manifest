@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Service 
+metadata:
+  name: gt-backend-service
+  labels:
+    app: gt-backend-app
+spec:
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9876
+    name: health-check
+  - protocol: TCP
+    port: 3000
+    name: listener
+  selector:
+    app: gt-backend-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gt-backend-deployment
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: gt-backend-app
+  template:
+    metadata:
+      labels:
+        app: gt-backend-app
+    spec:
+      containers:
+      - name: gt-backend-app
+        image: ghcr.io/intersectmbo/govtool-govtool-backend:edc71a4796fdd6bc587b8d116dedecbbf2c7c1cd
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 9876
+        env:
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: DB_PASSWORD
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: db-credentials
+              key: DB_NAME
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
