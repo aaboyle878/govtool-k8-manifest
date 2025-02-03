@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: local-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"  # Enforce HTTPS
+spec:
+  tls:
+  - hosts:
+      - localhost
+    secretName: tls-secret
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - path: /frontend
+        pathType: Prefix
+        backend:
+          service:
+            name: gt-frontend-service
+            port:
+              number: 80
+      - path: /backend
+        pathType: Prefix
+        backend:
+          service:
+            name: gt-backend-service
+            port:
+              number: 80
+      - path: /metadata-validation
+        pathType: Prefix
+        backend:
+          service:
+            name: gt-metadata-validation
+            port:
+              number: 80
