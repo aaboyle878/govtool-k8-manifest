@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
       - name: gt-frontend-app
-        image: ghcr.io/intersectmbo/govtool-govtool-frontend:edc71a4796fdd6bc587b8d116dedecbbf2c7c1cd
+        image: aaron255/govtool-fe:0.3
         resources:
           limits:
             memory: "512Mi"
