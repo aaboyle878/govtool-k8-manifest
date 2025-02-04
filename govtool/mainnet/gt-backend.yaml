@@ -8,12 +8,12 @@ spec:
   type: NodePort
   ports:
   - protocol: TCP
+    port: 3000
+    name: listener
+  - protocol: TCP
     port: 80
     targetPort: 9876
     name: health-check
-  - protocol: TCP
-    port: 3000
-    name: listener
   selector:
     app: gt-backend-app
 ---
@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: gt-backend-app
-        image: ghcr.io/intersectmbo/govtool-govtool-backend:edc71a4796fdd6bc587b8d116dedecbbf2c7c1cd
+        image: aaron255/govtool-be:0.2
         resources:
           limits:
             memory: "512Mi"
