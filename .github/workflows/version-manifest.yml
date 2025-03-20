@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-    if: "github.event.head_commit.message !~ 'Versioned changed Kubernetes manifests' || github.actor != 'github-actions[bot]'"
+    paths-ignore:
+      - "govtool/**/_v*.yaml"
 
 jobs:
   version_manifests:
