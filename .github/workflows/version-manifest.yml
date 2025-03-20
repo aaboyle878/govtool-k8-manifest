@@ -24,7 +24,7 @@ jobs:
         id: changed_files
         run: |
           # Get a list of changed YAML files in govtool/preview and govtool/mainnet
-          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- 'govtool/preview/*.yaml' 'govtool/mainnet/*.yaml' || true)
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- 'kube-manifest/govtool/preview/*.yaml' 'kube-manifest/govtool/mainnet/*.yaml' || true)
           echo "Changed files:"
           echo "$CHANGED_FILES"
 
