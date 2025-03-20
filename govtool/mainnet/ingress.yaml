@@ -13,8 +13,6 @@ spec:
   tls:
   - hosts:
       - localhost
-      - be.localhost
-      - fe.localhost
     secretName: tls-secret
   rules:
   - host: localhost
