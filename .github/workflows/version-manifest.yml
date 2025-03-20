@@ -1,0 +1,75 @@
+name: Version Kubernetes Manifests
+
+on:
+  push:
+    branches:
+      - main  # Adjust branch if needed
+
+jobs:
+  version_manifests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Ensures we can compare against the previous commit
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Get Changed Manifests
+        id: changed_files
+        run: |
+          # Get a list of changed YAML files in govtool/preview and govtool/mainnet
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- 'govtool/preview/*.yaml' 'govtool/mainnet/*.yaml' || true)
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
+          # Store changed files in an output variable for later steps
+          echo "files=$CHANGED_FILES" >> "$GITHUB_ENV"
+
+      - name: Version and Retain Manifests
+        run: |
+          MAX_VERSIONS=20
+
+          for FILE in ${{ env.files }}; do
+            [ -f "$FILE" ] || continue  # Skip if file doesn't exist
+
+            DIR=$(dirname "$FILE")
+            BASENAME=$(basename "$FILE" .yaml)
+
+            cd "$DIR"
+
+            VERSIONS=($(ls -t ${BASENAME}_v*.yaml 2>/dev/null | sort -V))
+
+            # Determine next version number
+            if [ ${#VERSIONS[@]} -eq 0 ]; then
+              NEXT_VERSION=1
+            else
+              LATEST_VERSION=$(echo "${VERSIONS[-1]}" | grep -o '_v[0-9]*' | grep -o '[0-9]*')
+              NEXT_VERSION=$((LATEST_VERSION + 1))
+            fi
+
+            # Rename current "latest" file
+            mv "$BASENAME.yaml" "${BASENAME}_v${NEXT_VERSION}.yaml"
+
+            # Keep only the latest MAX_VERSIONS
+            VERSIONS=($(ls -t ${BASENAME}_v*.yaml 2>/dev/null | sort -V))
+            if [ ${#VERSIONS[@]} -gt $MAX_VERSIONS ]; then
+              DELETE_COUNT=$(( ${#VERSIONS[@]} - MAX_VERSIONS ))
+              for ((i=0; i<DELETE_COUNT; i++)); do
+                rm -f "${VERSIONS[$i]}"
+              done
+            fi
+
+            cd -  # Return to repo root
+          done
+
+      - name: Commit and Push Changes
+        run: |
+          git add .
+          git commit -m "Versioned changed Kubernetes manifests and retained last 20"
+          git push
