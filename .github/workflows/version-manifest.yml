@@ -3,7 +3,7 @@ name: Version Kubernetes Manifests
 on:
   push:
     branches:
-      - main  # Adjust branch if needed
+      - main  
 
 jobs:
   version_manifests:
