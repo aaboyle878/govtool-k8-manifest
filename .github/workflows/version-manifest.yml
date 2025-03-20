@@ -22,9 +22,9 @@ jobs:
           git config --global user.email "actions@github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
-          - name: Get Changed Manifests
-          id: changed_files
-          run: |
+      - name: Get Changed Manifests
+        id: changed_files
+        run: |
             CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- 'govtool/preview/*.yaml' 'govtool/mainnet/*.yaml' || \
                             git diff --name-only --cached -- 'govtool/preview/*.yaml' 'govtool/mainnet/*.yaml' || true)
             if [[ -z "$CHANGED_FILES" ]]; then
