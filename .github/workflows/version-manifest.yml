@@ -36,7 +36,9 @@ jobs:
             echo "Changed files:"
             echo "$CHANGED_FILES"
   
-            echo "files=$CHANGED_FILES" >> "$GITHUB_ENV"
+            echo "files<<EOF" >> "$GITHUB_ENV"
+            echo "$CHANGED_FILES" >> "$GITHUB_ENV"
+            echo "EOF" >> "$GITHUB_ENV"
   
       - name: Version and Retain Manifests
         run: |
