@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-      if: github.event.head_commit.message !~ 'Versioned changed Kubernetes manifests'
-      if: github.actor != 'github-actions[bot]'
+    if: "github.event.head_commit.message !~ 'Versioned changed Kubernetes manifests' || github.actor != 'github-actions[bot]'"
 
 jobs:
   version_manifests:
