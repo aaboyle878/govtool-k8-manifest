@@ -85,5 +85,10 @@ jobs:
       - name: Commit and Push Changes
         run: |
           git add .
+          if git diff --cached --quiet; then
+            echo "No changes to commit. Exiting."
+            exit 0
+          fi
+
           git commit -m "Versioned changed Kubernetes manifests and retained last 20"
-          git push
+          git push origin main
