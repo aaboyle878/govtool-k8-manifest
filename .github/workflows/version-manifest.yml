@@ -42,46 +42,46 @@ jobs:
   
       - name: Version and Retain Manifests
         run: |
-          MAX_VERSIONS=20
-          while IFS= read -r FILE; do
-            [ -f "$FILE" ] || continue  # Skip if file doesn't exist
-
-            DIR=$(dirname "$FILE")
-            BASENAME=$(basename "$FILE" .yaml)
-
-            cd "$DIR"
-
-            # Ensure the base filename is used correctly
-            CLEAN_NAME=$(echo "$BASENAME" | sed -E 's/_v[0-9]+$//')
-
-            # Get sorted list of existing versioned files
-            VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
-
-            # Determine next version number
-            if [ ${#VERSIONS[@]} -eq 0 ]; then
-              NEXT_VERSION=1
-            else
-              # Extract the highest version number
-              LATEST_VERSION=$(echo "${VERSIONS[-1]}" | grep -o '_v[0-9]\+' | sed 's/_v//g' | tail -n1)
-              NEXT_VERSION=$((LATEST_VERSION + 1))
-            fi
-
-            # Create a versioned copy without modifying the original
-            cp "$CLEAN_NAME.yaml" "${CLEAN_NAME}_v${NEXT_VERSION}.yaml"
-
-            # Keep only the last MAX_VERSIONS
-            VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
-            if [ ${#VERSIONS[@]} -gt $MAX_VERSIONS ]; then
-              DELETE_COUNT=$(( ${#VERSIONS[@]} - MAX_VERSIONS ))
-              for ((i=0; i<DELETE_COUNT; i++)); do
-                rm -f "${VERSIONS[$i]}"
-              done
-            fi
-
-            cd -  # Return to repo root
-          done <<< "${{ env.files }}"
-
-
+              MAX_VERSIONS=20
+          
+              # Loop over each changed file path
+              while IFS= read -r FILE; do
+                [ -f "$FILE" ] || continue  # Skip if file doesn't exist
+          
+                DIR=$(dirname "$FILE")
+                BASENAME=$(basename "$FILE" .yaml)
+                cd "$DIR"
+          
+                # Ensure the base filename is used correctly (removing version suffix if present)
+                CLEAN_NAME=$(echo "$BASENAME" | sed -E 's/_v[0-9]+$//')
+          
+                # Get sorted list of existing versioned files
+                VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
+          
+                # Determine next version number
+                if [ ${#VERSIONS[@]} -eq 0 ]; then
+                  NEXT_VERSION=1
+                else
+                  # Extract the highest version number
+                  LATEST_VERSION=$(echo "${VERSIONS[-1]}" | grep -o '_v[0-9]\+' | sed 's/_v//g' | tail -n1)
+                  NEXT_VERSION=$((LATEST_VERSION + 1))
+                fi
+          
+                # Create a versioned copy without modifying the original
+                cp "$CLEAN_NAME.yaml" "${CLEAN_NAME}_v${NEXT_VERSION}.yaml"
+          
+                # Keep only the last MAX_VERSIONS
+                VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
+                if [ ${#VERSIONS[@]} -gt $MAX_VERSIONS ]; then
+                  DELETE_COUNT=$(( ${#VERSIONS[@]} - MAX_VERSIONS ))
+                  for ((i=0; i<DELETE_COUNT; i++)); do
+                    rm -f "${VERSIONS[$i]}"
+                  done
+                fi
+          
+                cd -  # Return to repo root
+              done <<< "$CHANGED_FILES"  # Use the files directly as input to the loop
+          
       - name: Commit and Push Changes
         run: |
           git add .
