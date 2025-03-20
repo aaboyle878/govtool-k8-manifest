@@ -24,7 +24,12 @@ jobs:
         id: changed_files
         run: |
           # Get a list of changed YAML files in govtool/preview and govtool/mainnet
-          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- 'kube-manifest/govtool/preview/*.yaml' 'kube-manifest/govtool/mainnet/*.yaml' || true)
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- 'govtool/preview/*.yaml' 'govtool/mainnet/*.yaml' || \
+                          git diff --name-only --cached -- 'govtool/preview/*.yaml' 'govtool/mainnet/*.yaml' || true)
+          if [[ -z "$CHANGED_FILES" ]]; then
+            echo "No YAML files changed. Skipping workflow."
+            exit 0
+          fi
           echo "Changed files:"
           echo "$CHANGED_FILES"
 
