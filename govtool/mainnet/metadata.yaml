@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: gt-metadata-validation-app
-        image: ghcr.io/aaboyle878/govtool-metadata-validation-preview:a5ca8f2a7ac97fa5a2f72d1e4bbae08867cbb558
+        image: ghcr.io/intersectmbo/govtool-metadata-validation-prod:4253b82560bd2f14daa9c13c3c92ad951cc03ff7-25
         resources:
           limits:
             memory: "512Mi"
