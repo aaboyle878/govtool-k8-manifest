@@ -49,21 +49,22 @@ jobs:
 
               cd "$DIR"
 
-              VERSIONS=($(ls -t ${BASENAME}_v*.yaml 2>/dev/null | sort -V))
+              # Get a sorted list of versioned files
+              VERSIONS=($(ls -v ${BASENAME}_v*.yaml 2>/dev/null))
 
               # Determine next version number
               if [ ${#VERSIONS[@]} -eq 0 ]; then
                 NEXT_VERSION=1
               else
-                # Extract the highest version number
+                # Extract the latest version number from the last entry
                 LATEST_VERSION=$(echo "${VERSIONS[-1]}" | grep -o '_v[0-9]*' | sed 's/_v//')
                 NEXT_VERSION=$((LATEST_VERSION + 1))
               fi
 
-              # Rename current "latest" file with the correct version suffix
+              # Rename the current file with the new version
               mv "$BASENAME.yaml" "${BASENAME}_v${NEXT_VERSION}.yaml"
 
-              # Clean up old versions if there are too many
+              # Keep only the last MAX_VERSIONS
               VERSIONS=($(ls -t ${BASENAME}_v*.yaml 2>/dev/null | sort -V))
               if [ ${#VERSIONS[@]} -gt $MAX_VERSIONS ]; then
                 DELETE_COUNT=$(( ${#VERSIONS[@]} - MAX_VERSIONS ))
@@ -74,6 +75,7 @@ jobs:
 
               cd -  # Return to repo root
             done
+
 
   
 
