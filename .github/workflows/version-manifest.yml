@@ -3,7 +3,9 @@ name: Version Kubernetes Manifests
 on:
   push:
     branches:
-      - main  
+      - main
+      if: github.event.head_commit.message !~ 'Versioned changed Kubernetes manifests'
+      if: github.actor != 'github-actions[bot]'
 
 jobs:
   version_manifests:
