@@ -84,6 +84,7 @@ jobs:
           
       - name: Commit and Push Changes
         run: |
+          git status
           git add .
           if git diff --cached --quiet; then
             echo "No changes to commit. Exiting."
