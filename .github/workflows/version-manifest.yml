@@ -69,6 +69,7 @@ jobs:
           
                 # Create a versioned copy without modifying the original
                 cp "$CLEAN_NAME.yaml" "${CLEAN_NAME}_v${NEXT_VERSION}.yaml"
+                echo "Created versioned file: ${CLEAN_NAME}_v${NEXT_VERSION}.yaml"
           
                 # Keep only the last MAX_VERSIONS
                 VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
