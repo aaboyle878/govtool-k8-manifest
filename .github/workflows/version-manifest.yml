@@ -49,29 +49,26 @@ jobs:
 
               cd "$DIR"
 
-              # Get sorted list of versioned files
-              VERSIONS=($(ls -v ${BASENAME}_v*.yaml 2>/dev/null))
+              # Ensure the base filename is used correctly
+              CLEAN_NAME=$(echo "$BASENAME" | sed -E 's/_v[0-9]+$//')
+
+              # Get sorted list of existing versioned files
+              VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
 
               # Determine next version number
               if [ ${#VERSIONS[@]} -eq 0 ]; then
                 NEXT_VERSION=1
               else
-                # Extract the latest version number correctly
+                # Extract the highest version number
                 LATEST_VERSION=$(echo "${VERSIONS[-1]}" | grep -o '_v[0-9]\+' | sed 's/_v//g' | tail -n1)
-                
-                # Ensure it's a valid number before incrementing
-                if [[ -n "$LATEST_VERSION" && "$LATEST_VERSION" =~ ^[0-9]+$ ]]; then
-                  NEXT_VERSION=$((LATEST_VERSION + 1))
-                else
-                  NEXT_VERSION=1  # Fallback in case of unexpected formatting
-                fi
+                NEXT_VERSION=$((LATEST_VERSION + 1))
               fi
 
-              # Rename the current file with the new version
-              mv "$BASENAME.yaml" "${BASENAME}_v${NEXT_VERSION}.yaml"
+              # Create a versioned copy without modifying the original
+              cp "$CLEAN_NAME.yaml" "${CLEAN_NAME}_v${NEXT_VERSION}.yaml"
 
               # Keep only the last MAX_VERSIONS
-              VERSIONS=($(ls -v ${BASENAME}_v*.yaml 2>/dev/null))
+              VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
               if [ ${#VERSIONS[@]} -gt $MAX_VERSIONS ]; then
                 DELETE_COUNT=$(( ${#VERSIONS[@]} - MAX_VERSIONS ))
                 for ((i=0; i<DELETE_COUNT; i++)); do
@@ -81,7 +78,6 @@ jobs:
 
               cd -  # Return to repo root
             done
-
 
       - name: Commit and Push Changes
         run: |
