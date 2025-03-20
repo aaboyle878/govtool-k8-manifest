@@ -27,8 +27,8 @@ jobs:
       - name: Get Changed Manifests
         id: changed_files
         run: |
-            CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- 'govtool/preview/*.yaml' 'govtool/mainnet/*.yaml' || \
-                            git diff --name-only --cached -- 'govtool/preview/*.yaml' 'govtool/mainnet/*.yaml' || true)
+            CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- 'govtool/**/*.yaml' || \
+                            git diff --name-only --cached -- 'govtool/**/*.yaml' || true)
             if [[ -z "$CHANGED_FILES" ]]; then
               echo "No YAML files changed. Skipping workflow."
               exit 0
