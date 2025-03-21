@@ -28,36 +28,34 @@ jobs:
         id: changed_files
         run: |
             CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- 'govtool/**/*.yaml' || \
-                            git diff --name-only --cached -- 'govtool/**/*.yaml' || true)
+                git diff --name-only --cached -- 'govtool/**/*.yaml' || true)
+
             if [[ -z "$CHANGED_FILES" ]]; then
               echo "No YAML files changed. Skipping workflow."
               exit 0
             fi
-            echo "Changed files:"
-            echo "$CHANGED_FILES"
-  
+
             echo "files<<EOF" >> "$GITHUB_ENV"
-            echo "$CHANGED_FILES" >> "$GITHUB_ENV"
+            echo "$CHANGED_FILES" | tr ' ' '\n' >> "$GITHUB_ENV"  # Ensure new lines
             echo "EOF" >> "$GITHUB_ENV"
   
       - name: Version and Retain Manifests
         run: |
               MAX_VERSIONS=20
           
-              # Loop over each changed file path
-              while IFS= read -r FILE; do
+              while read -r FILE; do
                 [ -f "$FILE" ] || continue  # Skip if file doesn't exist
-          
+
                 DIR=$(dirname "$FILE")
                 BASENAME=$(basename "$FILE" .yaml)
                 cd "$DIR"
-          
+
                 # Ensure the base filename is used correctly (removing version suffix if present)
                 CLEAN_NAME=$(echo "$BASENAME" | sed -E 's/_v[0-9]+$//')
-          
+
                 # Get sorted list of existing versioned files
                 VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
-          
+
                 # Determine next version number
                 if [ ${#VERSIONS[@]} -eq 0 ]; then
                   NEXT_VERSION=1
@@ -66,11 +64,14 @@ jobs:
                   LATEST_VERSION=$(echo "${VERSIONS[-1]}" | grep -o '_v[0-9]\+' | sed 's/_v//g' | tail -n1)
                   NEXT_VERSION=$((LATEST_VERSION + 1))
                 fi
-          
+
                 # Create a versioned copy without modifying the original
                 cp "$CLEAN_NAME.yaml" "${CLEAN_NAME}_v${NEXT_VERSION}.yaml"
-                echo "Created versioned file: ${CLEAN_NAME}_v${NEXT_VERSION}.yaml"
-          
+                echo "Created versioned file: $(pwd)/${CLEAN_NAME}_v${NEXT_VERSION}.yaml"
+
+                # Debugging
+                ls -l $(pwd)/${CLEAN_NAME}_v*.yaml
+
                 # Keep only the last MAX_VERSIONS
                 VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
                 if [ ${#VERSIONS[@]} -gt $MAX_VERSIONS ]; then
@@ -79,18 +80,18 @@ jobs:
                     rm -f "${VERSIONS[$i]}"
                   done
                 fi
-          
+
                 cd -  # Return to repo root
-              done <<< "$CHANGED_FILES"  # Use the files directly as input to the loop
-          
+              done <<< "$(echo "$CHANGED_FILES" | tr ' ' '\n')"
+              git check-ignore -v govtool/**/*.yaml
+                        
       - name: Commit and Push Changes
         run: |
+          git add govtool/**/_v*.yaml
           git status
-          git add .
           if git diff --cached --quiet; then
             echo "No changes to commit. Exiting."
             exit 0
           fi
-
           git commit -m "Versioned changed Kubernetes manifests and retained last 20"
           git push origin main
