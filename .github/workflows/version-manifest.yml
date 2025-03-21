@@ -15,7 +15,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
+          fetch-depth: 0
           token: ${{ secrets.TOKEN }}
 
       - name: Setup Git with GITHUB_TOKEN
@@ -35,51 +35,54 @@ jobs:
             exit 0
           fi
 
-          echo "Detected changed files:"
-          echo "$CHANGED_FILES"
-
           echo "files<<EOF" >> "$GITHUB_ENV"
           echo "$CHANGED_FILES" | tr ' ' '\n' >> "$GITHUB_ENV"
           echo "EOF" >> "$GITHUB_ENV"
 
+      - name: Debug Changed Files
+        run: |
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
+
       - name: Version and Retain Manifests
         run: |
           MAX_VERSIONS=20
+
+          if [[ -z "$CHANGED_FILES" ]]; then
+            echo "No changed files detected. Exiting."
+            exit 0
+          fi
 
           echo "$CHANGED_FILES" | while IFS= read -r FILE; do
             [ -f "$FILE" ] || { echo "File $FILE does not exist, skipping..."; continue; }
 
             DIR=$(dirname "$FILE")
             BASENAME=$(basename "$FILE" .yaml)
-            cd "$DIR"
-
-            # Ensure the base filename is used correctly (removing version suffix if present)
             CLEAN_NAME=$(echo "$BASENAME" | sed -E 's/_v[0-9]+$//')
 
-            # Get sorted list of existing versioned files
+            cd "$DIR" || exit
+
+            # Find existing versions
             VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
 
-            # Determine next version number
+            # Determine next version
             if [ ${#VERSIONS[@]} -eq 0 ]; then
               NEXT_VERSION=1
             else
-              # Extract the highest version number
               LATEST_VERSION=$(echo "${VERSIONS[-1]}" | grep -o '_v[0-9]\+' | sed 's/_v//g' | tail -n1)
               NEXT_VERSION=$((LATEST_VERSION + 1))
             fi
 
-            # Ensure the original file exists before copying
+            # Ensure the original file exists
             if [ ! -f "$CLEAN_NAME.yaml" ]; then
-              echo "Original file $CLEAN_NAME.yaml does not exist, skipping..."
+              echo "Original file $CLEAN_NAME.yaml not found, skipping..."
               continue
             fi
 
-            # Create a versioned copy
-            cp "$CLEAN_NAME.yaml" "${CLEAN_NAME}_v${NEXT_VERSION}.yaml"
-            echo "Created versioned file: $(pwd)/${CLEAN_NAME}_v${NEXT_VERSION}.yaml"
-
-            # Debugging - list all versioned files
-            ls -l $(pwd)/${CLEAN_NAME}_v*.yaml
+            # Copy and version the file
+            NEW_VERSION_FILE="${CLEAN_NAME}_v${NEXT_VERSION}.yaml"
+            cp "$CLEAN_NAME.yaml" "$NEW_VERSION_FILE"
+            echo "Created: $NEW_VERSION_FILE"
 
             # Keep only the last MAX_VERSIONS
             VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
@@ -87,19 +90,20 @@ jobs:
               DELETE_COUNT=$(( ${#VERSIONS[@]} - MAX_VERSIONS ))
               for ((i=0; i<DELETE_COUNT; i++)); do
                 rm -f "${VERSIONS[$i]}"
+                echo "Deleted old version: ${VERSIONS[$i]}"
               done
             fi
 
-            cd -  # Return to repo root
+            cd - || exit
           done
 
       - name: Commit and Push Changes
         run: |
-          git add -f govtool/**/_v*.yaml  # Force add in case files are ignored by .gitignore
-          git status
-          if git diff --cached --quiet; then
-            echo "No changes to commit. Exiting."
+          if ! git ls-files --error-unmatch govtool/**/_v*.yaml >/dev/null 2>&1; then
+            echo "No versioned files created. Exiting."
             exit 0
           fi
+
+          git add -f govtool/**/_v*.yaml
           git commit -m "Versioned changed Kubernetes manifests and retained last 20"
           git push origin main
