@@ -26,7 +26,7 @@ kind: Deployment
 metadata:
   name: gt-backend-deployment
 spec:
-  replicas: 4
+  replicas: 13
   selector:
     matchLabels:
       app: gt-backend-app
