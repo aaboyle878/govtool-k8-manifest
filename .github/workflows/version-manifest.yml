@@ -44,18 +44,18 @@ jobs:
       - name: Debug Changed Files
         run: |
           echo "Changed files:"
-          echo "$CHANGED_FILES"
+          echo "$files"
 
       - name: Version and Retain Manifests
         run: |
           MAX_VERSIONS=20
 
-          if [[ -z "$CHANGED_FILES" ]]; then
+          if [[ -z "$files" ]]; then
             echo "No changed files detected. Exiting."
             exit 0
           fi
 
-          echo "$CHANGED_FILES" | while IFS= read -r FILE; do
+          while IFS= read -r FILE; do
             [ -f "$FILE" ] || { echo "File $FILE does not exist, skipping..."; continue; }
 
             DIR=$(dirname "$FILE")
