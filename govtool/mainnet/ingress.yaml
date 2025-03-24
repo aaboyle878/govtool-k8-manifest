@@ -13,7 +13,7 @@ spec:
   tls:
   - hosts:
       - localhost
-      - nearhost
+      - be.localhost
     secretName: tls-secret
   rules:
   - host: localhost
