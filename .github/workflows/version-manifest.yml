@@ -97,7 +97,7 @@ jobs:
             fi
 
             cd - || exit
-          done
+          done <<< "$files"
 
       - name: Commit and Push Changes
         run: |
