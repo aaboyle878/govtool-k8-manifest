@@ -38,6 +38,8 @@ jobs:
           echo "files<<EOF" >> "$GITHUB_ENV"
           echo "$CHANGED_FILES" | tr ' ' '\n' >> "$GITHUB_ENV"
           echo "EOF" >> "$GITHUB_ENV"
+          echo "Changed files:"
+          echo "$CHANGED_FILES"
 
       - name: Debug Changed Files
         run: |
