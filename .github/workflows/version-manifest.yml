@@ -55,7 +55,7 @@ jobs:
             exit 0
           fi
 
-          while IFS= read -r FILE; do
+          echo "$files" | while IFS= read -r FILE; do
             [ -f "$FILE" ] || { echo "File $FILE does not exist, skipping..."; continue; }
 
             DIR=$(dirname "$FILE")
@@ -97,7 +97,7 @@ jobs:
             fi
 
             cd - || exit
-          done <<< "$files"
+          done
 
       - name: Commit and Push Changes
         run: |
