@@ -60,6 +60,8 @@ jobs:
           # Convert space-separated string into an array
           IFS=' ' read -r -a FILES <<< "$files"
 
+          echo ${FILES[@]}
+
           for FILE in "${FILES[@]}"; do
             [ -f "$FILE" ] || { echo "File $FILE does not exist, skipping..."; continue; }
 
