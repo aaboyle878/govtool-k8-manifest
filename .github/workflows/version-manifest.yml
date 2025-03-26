@@ -57,24 +57,38 @@ jobs:
             exit 0
           fi
 
-          # Convert space-separated string into an array
           IFS=' ' read -r -a FILES <<< "$files"
 
-          echo ${FILES[@]}
+          echo "Processing files: ${FILES[@]}"
 
           for FILE in "${FILES[@]}"; do
-            [ -f "$FILE" ] || { echo "File $FILE does not exist, skipping..."; continue; }
+            echo "Checking: $FILE"
+
+            if [ ! -f "$FILE" ]; then
+              echo "❌ File $FILE does not exist, skipping..."
+              continue
+            fi
 
             DIR=$(dirname "$FILE")
             BASENAME=$(basename "$FILE" .yaml)
             CLEAN_NAME=$(echo "$BASENAME" | sed -E 's/_v[0-9]+$//')
 
-            cd "$DIR" || exit
+            echo "DIR: $DIR, BASENAME: $BASENAME, CLEAN_NAME: $CLEAN_NAME"
+
+            if [ ! -d "$DIR" ]; then
+              echo "❌ Directory $DIR does not exist. Skipping..."
+              continue
+            fi
+
+            cd "$DIR" || { echo "❌ Failed to cd into $DIR"; exit 2; }
+
+            echo "Current directory: $(pwd)"
 
             # Find existing versions
-            VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
+            VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null || true))
 
-            # Determine next version
+            echo "Found versions: ${VERSIONS[@]}"
+
             if [ ${#VERSIONS[@]} -eq 0 ]; then
               NEXT_VERSION=1
             else
@@ -82,29 +96,32 @@ jobs:
               NEXT_VERSION=$((LATEST_VERSION + 1))
             fi
 
-            # Ensure the original file exists
+            echo "Next version: $NEXT_VERSION"
+
             if [ ! -f "$CLEAN_NAME.yaml" ]; then
-              echo "Original file $CLEAN_NAME.yaml not found, skipping..."
+              echo "❌ Original file $CLEAN_NAME.yaml not found, skipping..."
               continue
             fi
 
-            # Copy and version the file
             NEW_VERSION_FILE="${CLEAN_NAME}_v${NEXT_VERSION}.yaml"
-            cp "$CLEAN_NAME.yaml" "$NEW_VERSION_FILE"
-            echo "Created: $NEW_VERSION_FILE"
+            echo "Creating new version: $NEW_VERSION_FILE"
+
+            cp "$CLEAN_NAME.yaml" "$NEW_VERSION_FILE" || { echo "❌ Failed to copy file"; exit 2; }
 
             # Keep only the last MAX_VERSIONS
-            VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null))
+            VERSIONS=($(ls -v ${CLEAN_NAME}_v*.yaml 2>/dev/null || true))
+
             if [ ${#VERSIONS[@]} -gt $MAX_VERSIONS ]; then
               DELETE_COUNT=$(( ${#VERSIONS[@]} - MAX_VERSIONS ))
               for ((i=0; i<DELETE_COUNT; i++)); do
-                rm -f "${VERSIONS[$i]}"
-                echo "Deleted old version: ${VERSIONS[$i]}"
+                echo "Deleting old version: ${VERSIONS[$i]}"
+                rm -f "${VERSIONS[$i]}" || { echo "❌ Failed to delete ${VERSIONS[$i]}"; exit 2; }
               done
             fi
 
-            cd - || exit
+            cd - || { echo "❌ Failed to return to previous directory"; exit 2; }
           done
+
           
       - name: Commit and Push Changes
         run: |
