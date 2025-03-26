@@ -56,7 +56,9 @@ jobs:
           fi
 
           # Convert space-separated string into an array
-          for FILE in $files; do
+          IFS=$'\n' read -r -d '' -a FILES <<< "$files"
+
+          for FILE in "${FILES[@]}"; do
             [ -f "$FILE" ] || { echo "File $FILE does not exist, skipping..."; continue; }
 
             DIR=$(dirname "$FILE")
