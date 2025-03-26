@@ -55,7 +55,8 @@ jobs:
             exit 0
           fi
 
-          echo "$files" | while IFS= read -r FILE; do
+          # Convert space-separated string into an array
+          for FILE in $files; do
             [ -f "$FILE" ] || { echo "File $FILE does not exist, skipping..."; continue; }
 
             DIR=$(dirname "$FILE")
@@ -98,7 +99,7 @@ jobs:
 
             cd - || exit
           done
-
+          
       - name: Commit and Push Changes
         run: |
           if ! git ls-files --error-unmatch govtool/**/_v*.yaml >/dev/null 2>&1; then
