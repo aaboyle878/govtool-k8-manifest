@@ -27,19 +27,21 @@ jobs:
       - name: Get Changed Manifests
         id: changed_files
         run: |
-          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- 'govtool/**/*.yaml' || \
-              git diff --name-only --cached -- 'govtool/**/*.yaml' || true)
-
-          if [[ -z "$CHANGED_FILES" ]]; then
-            echo "No YAML files changed. Skipping workflow."
-            exit 0
-          fi
-
-          echo "files<<EOF" >> "$GITHUB_ENV"
-          echo "$CHANGED_FILES" | tr ' ' '\n' >> "$GITHUB_ENV"
-          echo "EOF" >> "$GITHUB_ENV"
-          echo "Changed files:"
-          echo "$CHANGED_FILES"
+            CHANGED_FILES=$(git diff --name-only HEAD^ HEAD -- 'govtool/**/*.yaml' || \
+                git diff --name-only --cached -- 'govtool/**/*.yaml' || true)
+        
+            if [[ -z "$CHANGED_FILES" ]]; then
+              echo "No YAML files changed. Skipping workflow."
+              exit 0
+            fi
+        
+            # Convert newlines to spaces for correct Bash array handling
+            CHANGED_FILES=$(echo "$CHANGED_FILES" | tr '\n' ' ')
+        
+            # Save to environment
+            echo "files=$CHANGED_FILES" >> "$GITHUB_ENV"
+        
+            echo "Changed files: $CHANGED_FILES"
 
       - name: Debug Changed Files
         run: |
