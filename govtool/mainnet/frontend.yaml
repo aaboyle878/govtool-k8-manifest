@@ -67,11 +67,6 @@ spec:
             secretKeyRef:
               name: fe-env-vars
               key: VITE_SENTRY_DSN 
-        - name: VITE_GTM_ID
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_GTM_ID 
         - name: VITE_IS_DEV
           valueFrom:
             secretKeyRef:
@@ -102,11 +97,6 @@ spec:
             secretKeyRef:
               name: fe-env-vars
               key: VITE_IPFS_GATEWAY 
-        - name: VITE_IPFS_PROJECT_ID
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_IPFS_PROJECT_ID 
   strategy:
     type: RollingUpdate
     rollingUpdate:
