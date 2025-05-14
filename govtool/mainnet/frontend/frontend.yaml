@@ -55,62 +55,9 @@ spec:
           periodSeconds: 30
           failureThreshold: 3
           timeoutSeconds: 5
-        env:
-        - name: VITE_APP_ENV
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_APP_ENV
-        - name: VITE_BASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_BASE_URL 
-        - name: VITE_METADATA_API_URL
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_METADATA_API_URL 
-        - name: VITE_NETWORK_FLAG
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_NETWORK_FLAG 
-        - name: VITE_SENTRY_DSN
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_SENTRY_DSN 
-        - name: VITE_IS_DEV
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_IS_DEV 
-        - name: VITE_USERSNAP_SPACE_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_USERSNAP_SPACE_API_KEY 
-        - name: VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED 
-        - name: VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED 
-        - name: VITE_PDF_API_URL
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_PDF_API_URL 
-        - name: VITE_IPFS_GATEWAY
-          valueFrom:
-            secretKeyRef:
-              name: fe-env-vars
-              key: VITE_IPFS_GATEWAY 
+        envFrom:
+        - secretRef:
+            name: fe-env-vars 
   strategy:
     type: RollingUpdate
     rollingUpdate:
