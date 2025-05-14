@@ -9,7 +9,6 @@ metadata:
     nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type, Authorization"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
   tls:
   - hosts:
@@ -24,6 +23,13 @@ spec:
         backend:
           service:
             name: gt-backend-service
+            port:
+              number: 80
+      - path: /api-md(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: gt-metadata-validation-service
             port:
               number: 80
       - path: /(.*)
