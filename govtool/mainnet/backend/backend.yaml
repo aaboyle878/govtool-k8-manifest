@@ -31,9 +31,12 @@ spec:
       - name: gt-backend-app
         image: ghcr.io/intersectmbo/govtool-backend-prod:4253b82560bd2f14daa9c13c3c92ad951cc03ff7-25
         resources:
-          limits:
+          requests:
             memory: "512Mi"
             cpu: "500m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
         ports:
         - containerPort: 443
         env:
