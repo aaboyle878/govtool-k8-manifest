@@ -1,5 +1,5 @@
 localhost*
 *secret*
 cm*
-DS_Store*
+.DS_Store*
 *.log
