@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fe-env-vars
+type: Opaque
+stringData:
+  VITE_APP_ENV: ""
+  VITE_BASE_URL: ""
+  VITE_METADATA_API_URL: ""
+  VITE_NETWORK_FLAG: ""
+  VITE_SENTRY_DSN: ""
+  VITE_IS_DEV: ""
+  VITE_USERSNAP_SPACE_API_KEY: ""
+  VITE_IS_PROPOSAL_DISCUSSION_FORUM_ENABLED: ""
+  VITE_IS_GOVERNANCE_OUTCOMES_PILLAR_ENABLED: ""
+  VITE_PDF_API_URL: ""
+  VITE_IPFS_GATEWAY: ""
+  VITE_IPFS_PROJECT_ID: ""
