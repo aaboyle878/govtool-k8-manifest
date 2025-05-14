@@ -9,7 +9,7 @@ spec:
   ports:
   - name: http
     port: 80
-    targetport: 80
+    targetPort: 80
   selector:
     app: gt-frontend-app
 ---
