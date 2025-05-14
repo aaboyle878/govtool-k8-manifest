@@ -35,7 +35,7 @@ spec:
             memory: "512Mi"
             cpu: "500m"
         ports:
-        - containerPort: 443
+        - containerPort: 80
         env:
         - name: VITE_APP_ENV
           valueFrom:
