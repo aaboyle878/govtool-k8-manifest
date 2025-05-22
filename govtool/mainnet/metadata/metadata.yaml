@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service 
 metadata:
   name: gt-metadata-validation-service
+  namespace: govtool
   labels:
     app: gt-metadata-validation-app
 spec:
@@ -17,6 +18,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gt-metadata-validation-deployment
+  namespace: govtool
 spec:
   replicas: 2
   selector:
@@ -29,7 +31,7 @@ spec:
     spec:
       containers:
       - name: gt-metadata-validation-app
-        image: ghcr.io/intersectmbo/govtool-metadata-validation-prod:4253b82560bd2f14daa9c13c3c92ad951cc03ff7-25
+        image: ghcr.io/aaboyle878/govtool-metadata-validation-prod:3ac4e47c952d87e61757e25004719e2543255121-36
         resources:
           requests:
             memory: "512Mi"
@@ -39,22 +41,13 @@ spec:
             cpu: "1000m"
         ports:
         - containerPort: 3000
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 9876
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 9876
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          timeoutSeconds: 5
-          failureThreshold: 3
+
+        env:
+        - name: PORT
+          value: "3000"
+        - name: HOST
+          value: "0.0.0.0"
+        
   strategy:
     type: RollingUpdate
     rollingUpdate:
