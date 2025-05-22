@@ -1,0 +1,14 @@
+{
+    "dbsyncconfig" : {
+        "host"    : "",
+        "dbname"  : "",
+        "user"    : "",
+        "password" : "",
+        "port"    : 5432
+      },
+    "port" : 9876,
+    "host" : "0.0.0.0",
+    "cachedurationseconds": 20,
+    "sentrydsn": "",
+    "sentryenv": ""
+}
