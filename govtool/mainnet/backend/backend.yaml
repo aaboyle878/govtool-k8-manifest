@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service 
 metadata:
   name: gt-backend-service
+  namespace: govtool
   labels:
     app: gt-backend-app
 spec:
@@ -17,6 +18,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gt-backend-deployment
+  namespace: govtool
 spec:
   replicas: 4
   selector:
@@ -29,7 +31,7 @@ spec:
     spec:
       containers:
       - name: gt-backend-app
-        image: ghcr.io/intersectmbo/govtool-backend-prod:4253b82560bd2f14daa9c13c3c92ad951cc03ff7-25
+        image: ghcr.io/aaboyle878/govtool-backend-prod:3ac4e47c952d87e61757e25004719e2543255121-36
         resources:
           requests:
             memory: "512Mi"
@@ -38,26 +40,24 @@ spec:
             memory: "1024Mi"
             cpu: "1000m"
         ports:
-        - containerPort: 80
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 9876
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 9876
-          initialDelaySeconds: 10
-          periodSeconds: 30
-          timeoutSeconds: 5
-          failureThreshold: 3
-        envFrom:
-        - secretRef:
-            name: db-env-vars
+        - containerPort: 9876
+        command: ["/usr/local/bin/vva-be"]
+        args:
+          - "-c"
+          - "/run/secrets/config.json"
+          - "start-app"
+
+        volumeMounts:
+        - name: gt-backend-volume
+          mountPath: /run/secrets/config.json
+          subPath: config.json
+          readOnly: true
+
+      volumes:
+      - name: gt-backend-volume
+        secret:
+          secretName: db-config
+
   strategy:
     type: RollingUpdate
     rollingUpdate:
