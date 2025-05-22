@@ -13,29 +13,39 @@ spec:
   tls:
   - hosts:
       - localhost
-    secretName: tls-secret
+      - be.localhost
+      - md.localhost
+      - pdf.localhost
+      - oc.localhost
+    secretName: govtool-tls
   rules:
   - host: localhost
     http:
       paths:
-      - path: /api-be(/|$)(.*)
+      - path: /()(.*)
         pathType: Prefix
         backend:
           service:
-            name: gt-backend-service
+            name: gt-frontend-service
             port:
               number: 80
-      - path: /api-md(/|$)(.*)
+  - host: md.localhost
+    http:
+      paths:
+      - path: /()(.*)
         pathType: Prefix
         backend:
           service:
             name: gt-metadata-validation-service
             port:
               number: 80
-      - path: /(.*)
+  - host: be.localhost
+    http:
+      paths:
+      - path: /()(.*)
         pathType: Prefix
         backend:
           service:
-            name: gt-frontend-service
+            name: gt-backend-service
             port:
               number: 80
