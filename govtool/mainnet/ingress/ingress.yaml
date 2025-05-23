@@ -49,3 +49,13 @@ spec:
             name: gt-backend-service
             port:
               number: 80
+  - host: oc.localhost
+    http:
+      paths:
+      - path: /()(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: gt-outcomes-service
+            port:
+              number: 80
