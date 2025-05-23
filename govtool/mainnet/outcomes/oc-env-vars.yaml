@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: oc-env-vars
+type: Opaque
+stringData:
+#Update the values below with the actual values
+  DATABASE_HOST: ""
+  DATABASE_PORT: ""
+  DATABASE_NAME: ""
+  DATABASE_USER: ""
+  DATABASE_PASSWORD: ""
+  IPFS_GATEWAY: ""
+  PDF_API_URL: ""
