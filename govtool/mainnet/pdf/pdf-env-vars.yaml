@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pdf-env-vars
+  namespace: govtool
+type: Opaque
+stringData:
+  ADMIN_JWT_SECRET: ""
+  API_TOKEN_SALT: ""
+  APP_KEYS: ""
+  DATABASE_NAME: ""
+  DATABASE_HOST: 
+  DATABASE_USERNAME: ""
+  DATABASE_PASSWORD: ""
+  DATABASE_PORT: ""
+  DATABASE_CLIENT: ""
+  DATABASE_SSL: ""
+  GOVTOOL_API_BASE_URL: ""
+  JWT_SECRET: ""
+  JWT_SECRET_EXPIRES: ""
+  NODE_ENV: ""
+  REFRESH_SECRET: ""
+  REFRESH_TOKEN_EXPIRES: ""
+  TRANSFER_TOKEN_SALT: ""
+  POSTGRESQL_REPLICATION_USE_PASSFILE: ""
