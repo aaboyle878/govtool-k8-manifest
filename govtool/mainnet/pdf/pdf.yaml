@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service 
+metadata:
+  name: gt-pdf-service
+  namespace: govtool
+  labels:
+    app: gt-pdf-app
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 1337
+  selector:
+    app: gt-pdf-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gt-pdf-deployment
+  namespace: govtool
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gt-pdf-app
+  template:
+    metadata:
+      labels:
+        app: gt-pdf-app
+    spec:
+      containers:
+      - name: gt-pdf-app
+        image: ghcr.io/intersectmbo/govtool-proposal-pillar-backend:0bc51ed9051965291340b21e4f2df368eb54e20b-345
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1024Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 1337
+        envFrom:
+        - secretRef:
+            name: pdf-env-vars
+      
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
