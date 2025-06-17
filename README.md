@@ -7,4 +7,4 @@ The Images referenced within this repo have been built from forks of the parent 
 
 This repo has been set-up to allow anyone intereseted to clone and deploy their own version of [GovTool](https://gov.tools) using a local minikube cluster with the primary objective of encouraging community involvement with the project and providing a safe playground where anyone can explore the inner working of the application.
 
-For Instructions on how to get started please refer to the [wiki section](https://github.com/aaboyle878/kube-manifest/wiki)
+For Instructions on how to get started please refer to the [wiki section](https://github.com/aaboyle878/govtool-k8-manifest/wiki/Contents)
