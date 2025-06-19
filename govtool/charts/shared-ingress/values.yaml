@@ -1,0 +1,32 @@
+namespace: govtool
+
+tls:
+  enabled: true
+  secretName: govtool-tls
+  hosts:
+    - localhost
+    - be.localhost
+    - md.localhost
+    - pdf.localhost
+    - oc.localhost
+
+hosts:
+  - host: localhost
+    serviceName: gt-frontend-service
+    servicePort: 80
+
+  - host: md.localhost
+    serviceName: gt-metadata-validation-service
+    servicePort: 80
+
+  - host: be.localhost
+    serviceName: gt-backend-service
+    servicePort: 80
+
+  - host: oc.localhost
+    serviceName: gt-outcomes-service
+    servicePort: 80
+
+  - host: pdf.localhost
+    serviceName: gt-pdf-service
+    servicePort: 80
