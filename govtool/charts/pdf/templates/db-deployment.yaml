@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "gt-pdf-db.fullname" . }}-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.dbreplicas | default 1 }}
+  selector:
+    matchLabels:
+      app: pdf-postgres
+  template:
+    metadata:
+      labels:
+        app: pdf-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: {{ .Values.dbimage | default "postgres:16-alpine" }}
+
+        ports:
+        - containerPort: 5432
+        envFrom:
+        - secretRef:
+            name: pdf-db-connect
+        volumeMounts:
+        - name: {{ .Values.dbvolume.name | default "db-data" }}
+          mountPath: {{ .Values.dbvolume.mountPath | default "/var/lib/postgresql/data" }}
+      volumes:
+      - name: {{ .Values.dbvolume.name | default "db-data" }}
+        emptyDir: {}  # ephemeral; use PVC for persistent storage

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "gt-pdf.fullname" . }}-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicas}}
+  selector:
+    matchLabels:
+      app: gt-pdf-app
+  template:
+    metadata:
+      labels:
+        app: gt-pdf-app
+    spec:
+      containers:
+      - name: gt-pdf-app
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        resources:
+          requests:
+            memory: "{{ .Values.resources.requests.memory }}"
+            cpu: "{{ .Values.resources.requests.cpu }}"
+          limits:
+            memory: "{{ .Values.resources.limits.memory }}"
+            cpu: "{{ .Values.resources.limits.cpu }}"
+        ports:
+        - containerPort: 1337
+        envFrom:
+        - secretRef:
+            name: {{ .Values.pdfsecret.name }}
+      
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}

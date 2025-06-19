@@ -1,0 +1,65 @@
+namespace: govtool
+
+dbservice:
+  port: 5432
+  targetPort: 5432
+
+dbsecret:
+  name: pdf-db-connect
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: pdf-postgres
+
+dbreplicas: 1
+
+dbimage: postgres:16-alpine
+
+dbvolume:
+  name: db-data
+  mountPath: /var/lib/postgresql/data
+
+env:
+  adminJwtSecret: ""
+  apiTokenSalt: ""
+  appKeys: ""
+  dbclient: postgres
+  dbssl: "false"
+  govtoolApiBaseUrl: "https://be.localhost"
+  jwtSecret: ""
+  jwtSecretExpires: "1d"
+  nodeEnv: production
+  refreshSecret: ""
+  refreshTokenExpires: "1d"
+  transferTokenSalt: ""
+  postgresqlReplicationUsePassfile: "false"
+
+pdfsecret:
+  name: pdf-env-vars
+
+pdfservice:
+  port: 80
+  targetPort: 1337
+
+fullnameOverride: "gt-pdf"
+
+image:
+  repository: ghcr.io/intersectmbo/govtool-proposal-pillar-backend
+  tag: 0bc51ed9051965291340b21e4f2df368eb54e20b-345
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "1024Mi"
+    cpu: "1000m"
+
+strategy:
+  rollingUpdate:
+    maxSurge: 25%
+    maxUnavailable: 0
+
+replicas: 1
+
+pdfdb:
+  fullnameOverride: "gt-pdf-db"
