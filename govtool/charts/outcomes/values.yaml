@@ -1,0 +1,36 @@
+namespace: govtool
+replicaCount: 1
+image:
+  repository: ghcr.io/aaboyle878/govtool-outcomes-pillar-backend
+  tag: e08ed286979b0e7f5c846daed0ad3be7787af7a6-1
+env:
+  dbhost: 
+  dbport: 5432
+  dbname: 
+  dbuser: 
+  dbpassword: 
+  ipfsGateway: dweb.link/ipfs
+  pdfApiUrl: https://pdf.localhost/
+  value: 3000
+  hostvalue: 0.0.0.0
+  name: PORT
+  hostname: HOST
+
+service:
+  port: 80
+  targetPort: 3000
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "1024Mi"
+    cpu: "1000m"
+secret:
+  name: oc-env-vars
+strategy:
+  rollingUpdate:
+    maxSurge: 25%
+    maxUnavailable: 0
+    
+fullnameOverride: "gt-outcomes"
