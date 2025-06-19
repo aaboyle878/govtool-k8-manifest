@@ -1,0 +1,36 @@
+releases:
+  - name: backend
+    chart: ./charts/backend
+    namespace: govtool
+    values:
+      - ./charts/backend/values.yaml
+
+  - name: frontend
+    chart: ./charts/frontend
+    namespace: govtool
+    values:
+      - ./charts/frontend/values.yaml
+
+  - name: metadata
+    chart: ./charts/metadata
+    namespace: govtool
+    values:
+      - ./charts/metadata/values.yaml
+
+  - name: pdf
+    chart: ./charts/pdf
+    namespace: govtool
+    values:
+      - ./charts/pdf/values.yaml
+
+  - name: outcomes
+    chart: ./charts/outcomes
+    namespace: govtool
+    values:
+      - ./charts/outcomes/values.yaml
+
+  - name: shared-ingress
+    chart: ./charts/shared-ingress
+    namespace: govtool
+    values:
+      - ./charts/shared-ingress/values.yaml

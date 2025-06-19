@@ -1,0 +1,42 @@
+namespace: govtool
+replicaCount: 1
+
+image:
+  repository: ghcr.io/aaboyle878/govtool-backend-prod
+  tag: 3ac4e47c952d87e61757e25004719e2543255121-36
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "1024Mi"
+    cpu: "1000m"
+
+strategy:
+  maxSurge: "25%"
+  maxUnavailable: "0"
+
+service:
+  port: 80
+  targetPort: 9876
+
+secret:
+  name: db-config
+  configJson: |
+    {
+      "dbsyncconfig" : {
+        "host"    : "",
+        "dbname"  : "",
+        "user"    : "",
+        "password" : "",
+        "port"    : 5432
+      },
+      "port" : 9876,
+      "host" : "0.0.0.0",
+      "cachedurationseconds": 20,
+      "sentrydsn": "",
+      "sentryenv": ""
+    }
+
+fullnameOverride: "gt-backend"
