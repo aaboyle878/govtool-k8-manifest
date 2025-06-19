@@ -1,0 +1,27 @@
+namespace: govtool
+replicaCount: 1
+image:
+  repository: ghcr.io/aaboyle878/govtool-metadata-validation-prod
+  tag: 3ac4e47c952d87e61757e25004719e2543255121-36
+
+env:
+  name: PORT
+  value: 3000
+  hostname: HOST
+  host: 0.0.0.0
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "1024Mi"
+    cpu: "1000m"
+service:
+  port: 80
+  targetPort: 3000
+strategy:
+  maxSurge: "25%"
+  maxUnavailable: "0"
+
+fullnameOverride: "gt-metadata-validation"

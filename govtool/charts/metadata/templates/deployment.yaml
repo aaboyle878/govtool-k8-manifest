@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "gt-metadata.fullname" .}}-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: gt-metadata-validation-app
+  template:
+    metadata:
+      labels:
+        app: gt-metadata-validation-app
+    spec:
+      containers:
+      - name: gt-metadata-validation-app
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        resources:
+          requests:
+            memory: "{{ .Values.resources.requests.memory }}"
+            cpu: "{{ .Values.resources.requests.cpu }}"
+          limits:
+            memory: "{{ .Values.resources.limits.memory }}"
+            cpu: "{{ .Values.resources.limits.cpu }}"
+        ports:
+        - containerPort: 3000
+
+        env:
+        - name: {{ .Values.env.name }}
+          value: "{{ .Values.env.value }}"
+        - name: {{ .Values.env.hostname }}
+          value: "{{ .Values.env.host }}"
+        
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.strategy.maxSurge }}
+      maxUnavailable: {{ .Values.strategy.maxUnavailable }}
